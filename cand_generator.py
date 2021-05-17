@@ -6,10 +6,6 @@ OUT_DIR = "out"
 # ======================
 
 
-def perform_read():
-    pass
-
-
 print("Generator started!\n")
 current_time = 0
 in_file = open("input.txt", "r")
@@ -37,7 +33,36 @@ for _ in range(row_count):
 
 inputs = [BL, BuL, WL, SL]
 input_names = ["bl", "bul", "wl", "sl"]
+# ======================
 
+
+def perform_read(rows):
+    for row in rows:
+        if(row >= row_count):
+            print(
+                f"Error: Row index is out of bounds. Number of rows is {row_count}")
+            exit()
+
+    # actual read
+    for bl in BL:
+        bl.append(0)
+    for bul in BuL:
+        bul.append(0)
+
+    for i, wl in enumerate(WL):
+        if i in rows:  # selected row
+            wl.append("VWL")
+        else:  # unselected row
+            wl.append("0")
+
+    for i, sl in enumerate(SL):
+        if i in rows:  # selected row
+            sl.append("VSL")
+        else:  # unselected row
+            sl.append("0")
+
+
+# ======================
 for line in in_file:
     print(f"parsing: {line}", end="")
     args = line.split()
@@ -47,7 +72,7 @@ for line in in_file:
     # WRITE
     if command == "w":
         if(len(args) != 3):
-            print("Wrong amount of arguments.")
+            print("Error: Wrong amount of arguments.")
             exit()
         row0 = int(args[1])
         bits = list(args[2])
@@ -101,42 +126,34 @@ for line in in_file:
     # READ
     elif command == "r":
         if(len(args) < 2):
-            print("Wrong amount of arguments.")
+            print("Error: Wrong amount of arguments.")
             exit()
         rows = args[1:]
         rows = [int(row) for row in rows]
         print(f"Reading rows {rows}")
-        for row in rows:
-            if(row >= row_count):
-                print(
-                    f"Error: Row index is out of bounds. Number of rows is {row_count}")
-                exit()
+        perform_read(rows)
 
-        # actual read
-        for bl in BL:
-            bl.append(0)
-        for bul in BuL:
-            bul.append(0)
-
-        for i, wl in enumerate(WL):
-            if i in rows:  # selected row
-                wl.append("VWL")
-            else:  # unselected row
-                wl.append("0")
-
-        for i, sl in enumerate(SL):
-            if i in rows:  # selected row
-                sl.append("VSL")
-            else:  # unselected row
-                sl.append("0")
     # CAM SEARCH
     elif command == "s":
         if(len(args) != 3):
-            print("Wrong amount of arguments.")
+            print("Error: Wrong amount of arguments.")
             exit()
         print("Doing CAM search!")
-        print("Error: Unimplemented yet!")
-        exit()
+        col = int(args[1])
+        bits = list(args[2])
+        bits = [int(bit) for bit in bits]
+        if len(bits) != row_count/2:
+            print(
+                f"Error: Wrong amount of bits to search. {row_count/2} required, {len(bits)} given.")
+            exit
+        rows = []
+        for i, bit in enumerate(bits):
+            if bit == 1:
+                rows.append(2*i)
+            else:
+                rows.append(2*i+1)
+        perform_read(rows)
+
     # ERROR
     else:
         print(f"Error: Unknown command: {command}")
@@ -170,15 +187,6 @@ try:
     print("Created output directory.")
 except FileExistsError:
     print("Notice: output directory already exists.")
-
-# write results into files
-# for i, wl in enumerate(WL):
-#     out_file = open(f"{OUT_DIR}/wl_{i}.txt", "w")
-#     out_file.write("0u 0\n")
-#     for i, v in enumerate(wl):
-#         out_file.write(f"{i*HOLD_TIME+SWITCH_TIME}u {v}\n")
-#         out_file.write(f"{(i+1)*HOLD_TIME}u {v}\n")
-#     out_file.close()
 
 for input_id, input in enumerate(inputs):
     for i, arr in enumerate(input):
