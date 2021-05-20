@@ -1,6 +1,6 @@
 import os
 
-HOLD_TIME = 10
+HOLD_TIME = 5
 SWITCH_TIME = 0.1
 OUT_DIR = "out"
 # ======================
@@ -24,19 +24,24 @@ BL = []
 BuL = []
 WL = []
 SL = []
+BL_SW = []
+SL_SW = []
 for _ in range(col_count):
     BL.append([])
     BuL.append([])
+    BL_SW.append([])
 for _ in range(row_count):
     WL.append([])
     SL.append([])
+    SL_SW.append([])
 
-inputs = [BL, BuL, WL, SL]
-input_names = ["bl", "bul", "wl", "sl"]
+inputs = [BL, BuL, WL, SL, BL_SW, SL_SW]
+input_names = ["bl", "bul", "wl", "sl", "bl_sw", "sl_sw"]
 # ======================
 
 
-def perform_read(rows):
+def perform_read(rows, cols=[]):
+    print(f"Reading rows {rows}, columns {cols}")
     for row in rows:
         if(row >= row_count):
             print(
@@ -48,6 +53,17 @@ def perform_read(rows):
         bl.append(0)
     for bul in BuL:
         bul.append(0)
+
+    for i, bl_sw in enumerate(BL_SW):
+        if i in cols or len(cols) == 0:
+            bl_sw.append(1)
+        else:
+            bl_sw.append(-1)
+    for i, sl_sw in enumerate(SL_SW):
+        if i in rows:
+            sl_sw.append(1)
+        else:
+            sl_sw.append(-1)
 
     for i, wl in enumerate(WL):
         if i in rows:  # selected row
@@ -97,6 +113,12 @@ for line in in_file:
             for bl in BL:
                 bl.append(0)
 
+            # setup switches
+            for sl_sw in SL_SW:
+                sl_sw.append(1)
+            for bl_sw in BL_SW:
+                bl_sw.append(1)
+
         # write zeros
         for i, bit in enumerate(bits):
             if bit == "0":
@@ -139,7 +161,13 @@ for line in in_file:
             print("Error: Wrong amount of arguments.")
             exit()
         print("Doing CAM search!")
-        col = int(args[1])
+
+        cols = args[1]
+        if cols[0] == "a":
+            cols = []
+        cols = list(cols)
+        cols = [int(col) for col in cols]
+
         bits = list(args[2])
         bits = [int(bit) for bit in bits]
         if len(bits) != row_count/2:
@@ -152,7 +180,7 @@ for line in in_file:
                 rows.append(2*i)
             else:
                 rows.append(2*i+1)
-        perform_read(rows)
+        perform_read(rows, cols)
 
     # ERROR
     else:
