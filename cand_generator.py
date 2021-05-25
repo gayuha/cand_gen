@@ -156,7 +156,7 @@ for line in in_file:
         perform_read(rows)
 
     # CAM SEARCH
-    elif command == "s":
+    elif command == "sh" or command == "sl":
         if(len(args) != 3):
             print("Error: Wrong amount of arguments.")
             exit()
@@ -175,11 +175,18 @@ for line in in_file:
                 f"Error: Wrong amount of bits to search. {row_count/2} required, {len(bits)} given.")
             exit
         rows = []
-        for i, bit in enumerate(bits):
-            if bit == 1:
-                rows.append(2*i)
-            else:
-                rows.append(2*i+1)
+        if command == "sh":
+            for i, bit in enumerate(bits):
+                if bit == 1:
+                    rows.append(2*i)
+                else:
+                    rows.append(2*i+1)
+        else:  # sl
+            for i, bit in enumerate(bits):
+                if bit == 0:
+                    rows.append(2*i)
+                else:
+                    rows.append(2*i+1)
         perform_read(rows, cols)
 
     # ERROR
