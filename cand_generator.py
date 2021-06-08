@@ -1,14 +1,15 @@
 import os
 
-HOLD_TIME = 5
-SWITCH_TIME = 0.1
+HOLD_TIME = 1
+SWITCH_TIME = HOLD_TIME/100
 OUT_DIR = "out"
+INPUT_FILE = "input16_5.txt"
 # ======================
 
 
 print("Generator started!\n")
 current_time = 0
-in_file = open("input.txt", "r")
+in_file = open(INPUT_FILE, "r")
 
 # Set size
 params = in_file.readline().split()
@@ -78,11 +79,67 @@ def perform_read(rows, cols=[]):
             sl.append("0")
 
 
+def perform_write(row0, bits):
+    print(f"Writing bits {bits} to row {row0}")
+    if(len(bits) != col_count):
+        print(
+            f"Error: Number of columns is {col_count}, attempted to write {len(bits)} bits.")
+        exit()
+    if(row0 >= row_count):
+        print(
+            f"Error: Row index is out of bounds. Number of rows is {row_count}")
+        exit()
+
+    # the actual write
+
+    for _ in range(2):  # we write zeros in one cycle, and ones in another cycle
+        # setup rows
+        for sl in SL:
+            sl.append(0)
+
+        # setup BL
+        for bl in BL:
+            bl.append(0)
+
+        # setup switches
+        for sl_sw in SL_SW:
+            sl_sw.append(1)
+        for bl_sw in BL_SW:
+            bl_sw.append(1)
+
+    # write zeros
+    for i, bit in enumerate(bits):
+        if bit == "0":
+            BuL[i].append(0)
+        else:
+            BuL[i].append("2*VW0/3")
+
+    for i, wl in enumerate(WL):
+        if i == row0:  # selected row
+            wl.append("VW0")
+        else:  # unselected row
+            wl.append("VW0/3")
+
+    # write ones
+    for i, bit in enumerate(bits):
+        if bit == "1":
+            BuL[i].append("-VW1/2")
+        else:
+            BuL[i].append(0)
+
+    for i, wl in enumerate(WL):
+        if i == row0:  # selected row
+            wl.append("VW1/2")
+        else:  # unselected row
+            wl.append(0)
+
+
 # ======================
 for line in in_file:
     print(f"parsing: {line}", end="")
     args = line.split()
-    # print(args)
+    if len(args) == 0:
+        continue
     command = args[0]
 
     # WRITE
@@ -92,58 +149,18 @@ for line in in_file:
             exit()
         row0 = int(args[1])
         bits = list(args[2])
-        print(f"Writing bits {bits} to row {row0}")
-        if(len(bits) != col_count):
-            print(
-                f"Error: Number of columns is {col_count}, attempted to write {len(bits)} bits.")
+        perform_write(row0, bits)
+
+    elif command == "wc":
+        if(len(args) != 3):
+            print("Error: Wrong amount of arguments.")
             exit()
-        if(row0 >= row_count):
-            print(
-                f"Error: Row index is out of bounds. Number of rows is {row_count}")
-            exit()
-
-        # the actual write
-
-        for _ in range(2):  # we write zeros in one cycle, and ones in another cycle
-            # setup rows
-            for sl in SL:
-                sl.append(0)
-
-            # setup BL
-            for bl in BL:
-                bl.append(0)
-
-            # setup switches
-            for sl_sw in SL_SW:
-                sl_sw.append(1)
-            for bl_sw in BL_SW:
-                bl_sw.append(1)
-
-        # write zeros
-        for i, bit in enumerate(bits):
-            if bit == "0":
-                BuL[i].append(0)
-            else:
-                BuL[i].append("2*VW0/3")
-
-        for i, wl in enumerate(WL):
-            if i == row0:  # selected row
-                wl.append("VW0")
-            else:  # unselected row
-                wl.append("VW0/3")
-
-        # write ones
-        for i, bit in enumerate(bits):
-            if bit == "1":
-                BuL[i].append("-VW1/2")
-            else:
-                BuL[i].append(0)
-
-        for i, wl in enumerate(WL):
-            if i == row0:  # selected row
-                wl.append("VW1/2")
-            else:  # unselected row
-                wl.append(0)
+        row0 = int(args[1])*2
+        row1 = int(args[1])*2+1
+        bits = list(args[2])
+        bits_not = [str(1-int(bit)) for bit in bits]
+        perform_write(row0, bits)
+        perform_write(row1, bits_not)
 
     # READ
     elif command == "r":
@@ -154,6 +171,15 @@ for line in in_file:
         rows = [int(row) for row in rows]
         print(f"Reading rows {rows}")
         perform_read(rows)
+
+    # READ
+    elif command == "ra":
+        if(len(args) < 1 or len(args) > 1):
+            print("Error: Wrong amount of arguments.")
+            exit()
+        print(f"Reading all rows.")
+        for row in range(row_count):
+            perform_read([row])
 
     # CAM SEARCH
     elif command == "sh" or command == "sl":
@@ -172,7 +198,7 @@ for line in in_file:
         bits = [int(bit) for bit in bits]
         if len(bits) != row_count/2:
             print(
-                f"Error: Wrong amount of bits to search. {row_count/2} required, {len(bits)} given.")
+                f"Error: Wrong amount of bits to search. {int(row_count/2)} required, {len(bits)} given.")
             exit
         rows = []
         if command == "sh":
@@ -189,6 +215,9 @@ for line in in_file:
                     rows.append(2*i+1)
         perform_read(rows, cols)
 
+    # COMMENT
+    elif command[0] == "#":
+        continue
     # ERROR
     else:
         print(f"Error: Unknown command: {command}")
@@ -196,11 +225,13 @@ for line in in_file:
     print("End of line\n")
 in_file.close()
 
-print("Parsing finished. Printing results:")
-print("BL : ", BL)
-print("BuL: ", BuL)
-print("WL : ", WL)
-print("SL : ", SL)
+
+print("Parsing finished.")
+# print("Parsing finished. Printing results:")
+# print("BL : ", BL)
+# print("BuL: ", BuL)
+# print("WL : ", WL)
+# print("SL : ", SL)
 
 # sanity check
 length = len(WL[0])
@@ -212,6 +243,8 @@ for input in inputs:
 
 print(f"Sanity check passed: arrays are of the same length: {length}.")
 print(f"Simulation length should be at least: {length*HOLD_TIME}us.")
+print(f"Hold Time is: {HOLD_TIME}us.")
+print(f"Switch Time is: {SWITCH_TIME}us.")
 
 # print(inputs)
 
