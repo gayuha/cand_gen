@@ -13,11 +13,12 @@ in_file = open(INPUT_FILE, "r")
 
 # Set size
 params = in_file.readline().split()
-if(len(params) != 2):
-    print(f"Error: 2 parameters should be given, {len(params)} given.")
+if(len(params) != 3):
+    print(f"Error: 3 parameters should be given, {len(params)} given.")
     exit()
 row_count = int(params[0])
 col_count = int(params[1])
+banks_count = int(params[2])
 
 print(f"Parsed array size: {row_count} rows, {col_count} columns.")
 
@@ -27,6 +28,7 @@ WL = []
 SL = []
 BL_SW = []
 SL_SW = []
+ML_SW = []
 for _ in range(col_count):
     BL.append([])
     BuL.append([])
@@ -36,9 +38,27 @@ for _ in range(row_count):
     SL.append([])
     SL_SW.append([])
 
-inputs = [BL, BuL, WL, SL, BL_SW, SL_SW]
-input_names = ["bl", "bul", "wl", "sl", "bl_sw", "sl_sw"]
+for _ in range(banks_count-1):
+    ML_SW.append([])
+
+
+inputs = [BL, BuL, WL, SL, BL_SW, SL_SW, ML_SW]
+input_names = ["bl", "bul", "wl", "sl", "bl_sw", "sl_sw", "ml_sw"]
 # ======================
+
+
+def append_ml_sw(flip=False):
+    for ml_sw in ML_SW:
+        if(len(ml_sw) == 0):
+            if flip:
+                ml_sw.append(-1)
+            else:
+                ml_sw.append(1)
+        else:
+            if flip:
+                ml_sw.append(-ml_sw[-1])
+            else:
+                ml_sw.append(ml_sw[-1])
 
 
 def perform_read(rows, cols=[]):
@@ -54,6 +74,7 @@ def perform_read(rows, cols=[]):
         bl.append(0)
     for bul in BuL:
         bul.append(0)
+    append_ml_sw()
 
     for i, bl_sw in enumerate(BL_SW):
         if i in cols or len(cols) == 0:
@@ -106,6 +127,8 @@ def perform_write(row0, bits):
             sl_sw.append(1)
         for bl_sw in BL_SW:
             bl_sw.append(1)
+
+        append_ml_sw()
 
     # write zeros
     for i, bit in enumerate(bits):
@@ -214,6 +237,37 @@ for line in in_file:
                 else:
                     rows.append(2*i+1)
         perform_read(rows, cols)
+
+    elif command == "sw":
+        if(len(args) != 2):
+            print("Error: Wrong amount of arguments.")
+            exit()
+        bank = int(args[1])
+        if bank + 1 >= banks_count:
+            print("Error: Bank index too large.")
+            exit()
+        print(f"Switching banks {bank} and {bank+1}!")
+        for i, ml_sw in enumerate(ML_SW):
+            if(i == bank):
+                ML_SW[i].append(-(ML_SW[i][-1]))
+            else:
+                ML_SW[i].append(ML_SW[i][-1])
+        # fill in all inputs with zeros
+        for bl in BL:
+            bl.append(0)
+        for bul in BuL:
+            bul.append(0)
+
+        for bl_sw in BL_SW:
+            bl_sw.append(-1)
+        for sl_sw in SL_SW:
+            sl_sw.append(-1)
+
+        for wl in WL:
+            wl.append("0")
+
+        for sl in SL:
+            sl.append("0")
 
     # COMMENT
     elif command[0] == "#":
