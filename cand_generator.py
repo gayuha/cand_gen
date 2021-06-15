@@ -1,9 +1,9 @@
 import os
 
-HOLD_TIME = 1
+HOLD_TIME = 0.1
 SWITCH_TIME = HOLD_TIME/100
 OUT_DIR = "out"
-INPUT_FILE = "input16_5.txt"
+INPUT_FILE = "input4_4_2.txt"
 # ======================
 
 
