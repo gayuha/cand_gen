@@ -1,0 +1,17 @@
+18 3 3
+wc 0 101
+wc 1 110
+wc 2 010
+wc 3 001
+wc 4 101
+wc 5 101
+wc 6 110
+wc 7 001
+wc 8 010
+nop
+ra
+sw 0
+ra
+sw 0
+sw 1
+ra

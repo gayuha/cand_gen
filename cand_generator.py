@@ -1,9 +1,12 @@
 import os
+import math
 
-HOLD_TIME = 0.1
+HOLD_TIME = 10
 SWITCH_TIME = HOLD_TIME/100
+DECIMAL_COUNT = math.ceil(-math.log(min(HOLD_TIME, SWITCH_TIME), 10))
+FORMAT_STR = "{:."+str(DECIMAL_COUNT)+"f}"
 OUT_DIR = "out"
-INPUT_FILE = "input4_4_2.txt"
+INPUT_FILE = "input18_3_3.txt"
 # ======================
 
 
@@ -268,10 +271,28 @@ for line in in_file:
 
         for sl in SL:
             sl.append("0")
+    # NOP
+    elif command == "nop":
+        for bl in BL:
+            bl.append(0)
+        for bul in BuL:
+            bul.append(0)
 
+        for bl_sw in BL_SW:
+            bl_sw.append(-1)
+        for sl_sw in SL_SW:
+            sl_sw.append(-1)
+        append_ml_sw()
+
+        for wl in WL:
+            wl.append("0")
+
+        for sl in SL:
+            sl.append("0")
+        continue
     # COMMENT
     elif command[0] == "#":
-        continue
+        pass
     # ERROR
     else:
         print(f"Error: Unknown command: {command}")
@@ -315,8 +336,10 @@ for input_id, input in enumerate(inputs):
         out_file = open(f"{OUT_DIR}/{input_names[input_id]}_{i}.txt", "w")
         out_file.write("0u 0\n")
         for i, v in enumerate(arr):
-            out_file.write(f"{i*HOLD_TIME+SWITCH_TIME}u {v}\n")
-            out_file.write(f"{(i+1)*HOLD_TIME}u {v}\n")
+            time_1 = FORMAT_STR.format(i*HOLD_TIME+SWITCH_TIME)
+            time_2 = FORMAT_STR.format((i+1)*HOLD_TIME)
+            out_file.write(f"{time_1}u {v}\n")
+            out_file.write(f"{time_2}u {v}\n")
         out_file.close()
 
 print("Wrote files.")
