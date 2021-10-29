@@ -8,7 +8,6 @@ wc 5 1010
 wc 6 1100
 wc 7 0011
 wc 8 0101
-nop
 ra
 sw 0
 ra

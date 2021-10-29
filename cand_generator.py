@@ -6,7 +6,8 @@ SWITCH_TIME = HOLD_TIME/100
 DECIMAL_COUNT = math.ceil(-math.log(min(HOLD_TIME, SWITCH_TIME), 10))
 FORMAT_STR = "{:."+str(DECIMAL_COUNT)+"f}"
 OUT_DIR = "out"
-INPUT_FILE = "input18_3_3.txt"
+INPUT_FILE = "out.txt"
+# INPUT_FILE = "input18_4_3_(3).txt"
 # ======================
 
 
@@ -103,7 +104,7 @@ def perform_read(rows, cols=[]):
             sl.append("0")
 
 
-def perform_write(row0, bits):
+def perform_row_write(row0, bits):
     print(f"Writing bits {bits} to row {row0}")
     if(len(bits) != col_count):
         print(
@@ -160,6 +161,63 @@ def perform_write(row0, bits):
             wl.append(0)
 
 
+def perform_col_write(col0, bits):
+    print(f"Writing bits {bits} to col {col0}")
+    if(len(bits) != row_count):
+        print(
+            f"Error: Number of rows is {row_count}, attempted to write {len(bits)} bits.")
+        exit()
+    if(col0 >= col_count):
+        print(
+            f"Error: Column index is out of bounds. Number of columns is {col_count}")
+        exit()
+
+    # the actual write
+
+    for _ in range(2):  # we write zeros in one cycle, and ones in another cycle
+        # setup rows
+        for sl in SL:
+            sl.append(0)
+
+        # setup BL
+        for bl in BL:
+            bl.append(0)
+
+        # setup switches
+        for sl_sw in SL_SW:
+            sl_sw.append(1)
+        for bl_sw in BL_SW:
+            bl_sw.append(1)
+
+        append_ml_sw()
+
+    # write zeros
+    for i, bul in enumerate(BuL):
+        if i == col0:
+            BuL[i].append(0)
+        else:
+            BuL[i].append("2*VW0/3")
+
+    for i, bit in enumerate(bits):
+        if bit == "0":
+            WL[i].append("VW0")
+        else:
+            WL[i].append("VW0/3")
+
+    # write ones
+    for i, bul in enumerate(BuL):
+        if i == col0:
+            BuL[i].append("-VW1/2")
+        else:
+            BuL[i].append(0)
+
+    for i, bit in enumerate(bits):
+        if bit == "1":
+            WL[i].append("VW1/2")
+        else:
+            WL[i].append(0)
+
+
 # ======================
 for line in in_file:
     print(f"parsing: {line}", end="")
@@ -175,9 +233,9 @@ for line in in_file:
             exit()
         row0 = int(args[1])
         bits = list(args[2])
-        perform_write(row0, bits)
+        perform_row_write(row0, bits)
 
-    elif command == "wc":
+    elif command == "wcr":  # write cam row
         if(len(args) != 3):
             print("Error: Wrong amount of arguments.")
             exit()
@@ -185,8 +243,20 @@ for line in in_file:
         row1 = int(args[1])*2+1
         bits = list(args[2])
         bits_not = [str(1-int(bit)) for bit in bits]
-        perform_write(row0, bits)
-        perform_write(row1, bits_not)
+        perform_row_write(row0, bits)
+        perform_row_write(row1, bits_not)
+
+    elif command == "wcc":  # write cam column
+        if(len(args) != 3):
+            print("Error: Wrong amount of arguments.")
+            exit()
+        col = int(args[1])
+        bits_orig = list(args[2])
+        bits = []
+        for bit in bits_orig:
+            bits.append(bit)
+            bits.append(str(1-int(bit)))
+        perform_col_write(col, bits)
 
     # READ
     elif command == "r":
@@ -317,7 +387,7 @@ for input in inputs:
             exit()
 
 print(f"Sanity check passed: arrays are of the same length: {length}.")
-print(f"Simulation length should be at least: {length*HOLD_TIME}us.")
+print(f"Simulation length should be at least: {length*HOLD_TIME}u")
 print(f"Hold Time is: {HOLD_TIME}us.")
 print(f"Switch Time is: {SWITCH_TIME}us.")
 
