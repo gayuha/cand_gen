@@ -1,0 +1,11 @@
+4 4 0
+wcr 0 1010
+wcr 1 1100
+ra
+sh a 00
+wcc 0 11
+wcc 1 01
+wcc 2 10
+wcc 3 00
+ra
+sh a 00

@@ -1,13 +1,15 @@
 import os
 import math
+import logging
 
 HOLD_TIME = 10
 SWITCH_TIME = HOLD_TIME/100
-DECIMAL_COUNT = math.ceil(-math.log(min(HOLD_TIME, SWITCH_TIME), 10))
+DECIMAL_COUNT = max(0, math.ceil(-math.log(min(HOLD_TIME, SWITCH_TIME), 10)))
 FORMAT_STR = "{:."+str(DECIMAL_COUNT)+"f}"
 OUT_DIR = "out"
-INPUT_FILE = "out.txt"
-# INPUT_FILE = "input18_4_3_(3).txt"
+# INPUT_FILE = "out.txt"
+# INPUT_FILE = "input18_4_3.txt"
+INPUT_FILE = "out_random.txt"
 # ======================
 
 
@@ -24,7 +26,8 @@ row_count = int(params[0])
 col_count = int(params[1])
 banks_count = int(params[2])
 
-print(f"Parsed array size: {row_count} rows, {col_count} columns.")
+print(
+    f"Parsed array size: {row_count} rows, {col_count} columns, {banks_count} banks.")
 
 BL = []
 BuL = []
@@ -66,7 +69,7 @@ def append_ml_sw(flip=False):
 
 
 def perform_read(rows, cols=[]):
-    print(f"Reading rows {rows}, columns {cols}")
+    # print(f"Reading rows {rows}, columns {cols}")
     for row in rows:
         if(row >= row_count):
             print(
@@ -105,7 +108,7 @@ def perform_read(rows, cols=[]):
 
 
 def perform_row_write(row0, bits):
-    print(f"Writing bits {bits} to row {row0}")
+    # print(f"Writing bits {bits} to row {row0}")
     if(len(bits) != col_count):
         print(
             f"Error: Number of columns is {col_count}, attempted to write {len(bits)} bits.")
@@ -162,7 +165,7 @@ def perform_row_write(row0, bits):
 
 
 def perform_col_write(col0, bits):
-    print(f"Writing bits {bits} to col {col0}")
+    # print(f"Writing bits {bits} to col {col0}")
     if(len(bits) != row_count):
         print(
             f"Error: Number of rows is {row_count}, attempted to write {len(bits)} bits.")
@@ -186,8 +189,11 @@ def perform_col_write(col0, bits):
         # setup switches
         for sl_sw in SL_SW:
             sl_sw.append(1)
-        for bl_sw in BL_SW:
-            bl_sw.append(1)
+        for i, bl_sw in enumerate(BL_SW):
+            if (i == col0):
+                bl_sw.append(1)
+            else:
+                bl_sw.append(-1)  # close unneeded columns
 
         append_ml_sw()
 
@@ -220,7 +226,7 @@ def perform_col_write(col0, bits):
 
 # ======================
 for line in in_file:
-    print(f"parsing: {line}", end="")
+    # print(f"parsing: {line}", end="")
     args = line.split()
     if len(args) == 0:
         continue
@@ -265,7 +271,6 @@ for line in in_file:
             exit()
         rows = args[1:]
         rows = [int(row) for row in rows]
-        print(f"Reading rows {rows}")
         perform_read(rows)
 
     # READ
@@ -273,7 +278,7 @@ for line in in_file:
         if(len(args) < 1 or len(args) > 1):
             print("Error: Wrong amount of arguments.")
             exit()
-        print(f"Reading all rows.")
+        # print(f"Reading all rows.")
         for row in range(row_count):
             perform_read([row])
 
@@ -282,7 +287,7 @@ for line in in_file:
         if(len(args) != 3):
             print("Error: Wrong amount of arguments.")
             exit()
-        print("Doing CAM search!")
+        # print("Doing CAM search!")
 
         cols = args[1]
         if cols[0] == "a":
@@ -311,6 +316,7 @@ for line in in_file:
                     rows.append(2*i+1)
         perform_read(rows, cols)
 
+    # BANK SWITCH
     elif command == "sw":
         if(len(args) != 2):
             print("Error: Wrong amount of arguments.")
@@ -319,7 +325,7 @@ for line in in_file:
         if bank + 1 >= banks_count:
             print("Error: Bank index too large.")
             exit()
-        print(f"Switching banks {bank} and {bank+1}!")
+        # print(f"Switching banks {bank} and {bank+1}!")
         for i, ml_sw in enumerate(ML_SW):
             if(i == bank):
                 ML_SW[i].append(-(ML_SW[i][-1]))
@@ -367,7 +373,7 @@ for line in in_file:
     else:
         print(f"Error: Unknown command: {command}")
         exit()
-    print("End of line\n")
+    # print("End of line\n")
 in_file.close()
 
 
@@ -401,6 +407,8 @@ try:
 except FileExistsError:
     print("Notice: output directory already exists.")
 
+print("Writing output files... ", end="", flush=True)
+
 for input_id, input in enumerate(inputs):
     for i, arr in enumerate(input):
         out_file = open(f"{OUT_DIR}/{input_names[input_id]}_{i}.txt", "w")
@@ -412,5 +420,5 @@ for input_id, input in enumerate(inputs):
             out_file.write(f"{time_2}u {v}\n")
         out_file.close()
 
-print("Wrote files.")
+print(" Wrote files.")
 print("Generator finished successfully!")

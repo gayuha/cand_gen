@@ -1,0 +1,409 @@
+18 4 3
+wcr 4 1011
+wcr 5 0110
+wcr 4 0000
+wcr 1 0001
+wcr 4 1000
+wcr 3 1011
+wcr 1 0011
+wcr 2 1001
+wcr 1 1010
+wcr 7 0010
+wcr 0 0000
+wcr 6 1101
+wcr 4 0110
+wcr 8 1100
+wcr 8 1000
+wcr 5 0010
+ra
+wcr 1 1011
+wcr 4 1011
+wcr 2 0011
+sh a 101100111
+wcr 4 0011
+wcr 4 1101
+sh a 001010001
+wcr 4 0000
+wcr 2 0101
+wcr 1 1111
+wcr 2 0101
+sh a 000000111
+wcr 8 1011
+wcr 5 1001
+wcr 4 0101
+wcr 1 1110
+wcr 6 1011
+wcr 0 1100
+sh a 000110011
+wcr 5 1011
+sh a 101000110
+wcr 2 0011
+ra
+wcr 5 0010
+wcr 0 0010
+ra
+wcr 4 0000
+sh a 101111110
+wcr 6 0101
+wcr 8 1000
+ra
+wcr 5 0111
+wcr 6 0101
+sh a 011011010
+wcr 0 1100
+sh a 101101000
+wcr 2 0100
+sh a 000110010
+wcr 7 0011
+wcr 1 1110
+sh a 101010110
+wcr 5 0001
+wcr 3 0110
+wcr 3 1110
+wcr 1 1100
+wcr 2 1000
+wcr 7 0000
+wcr 1 0111
+wcr 0 1111
+wcr 3 0011
+wcr 7 1001
+sh a 110110111
+wcr 5 0100
+sh a 110111000
+wcr 6 1011
+wcr 5 0111
+ra
+wcr 4 0100
+wcr 2 0011
+wcr 6 0011
+ra
+wcr 1 0000
+wcr 1 1101
+ra
+wcr 6 1001
+wcr 1 0001
+ra
+wcr 5 1001
+sh a 111101010
+wcr 2 0000
+wcr 8 1011
+sh a 000101011
+wcr 4 0110
+sh a 101001011
+wcr 0 1101
+wcr 4 0010
+wcr 6 1000
+wcr 8 1100
+wcr 3 0011
+wcr 0 0111
+wcr 2 1100
+ra
+wcr 5 0110
+wcr 1 0111
+wcr 2 0101
+wcr 1 1111
+wcr 8 0110
+wcr 8 1000
+sh a 110011001
+wcr 3 1111
+wcr 6 0101
+wcr 6 0110
+wcr 2 0110
+ra
+wcr 6 0000
+wcr 6 0001
+wcr 0 1101
+ra
+wcr 1 1011
+wcr 8 0010
+sh a 010001010
+wcr 3 1010
+wcr 0 1010
+ra
+wcr 4 1111
+wcr 3 0001
+wcr 1 1111
+ra
+wcr 8 0011
+wcr 2 1000
+ra
+wcr 5 0010
+sh a 001000111
+wcr 3 1110
+ra
+wcr 1 1011
+wcr 1 0100
+sh a 101010101
+wcr 4 0110
+wcr 4 1111
+wcr 3 1110
+wcr 6 1000
+wcr 0 0110
+wcr 7 0001
+sh a 101000001
+wcr 4 0100
+wcr 2 0101
+wcr 4 0101
+wcr 6 0111
+ra
+wcr 0 1001
+wcr 1 1100
+wcr 3 0000
+wcr 8 1011
+sh a 110011111
+wcr 7 0000
+sh a 111001011
+wcr 6 1010
+wcr 6 0001
+wcr 0 1010
+wcr 4 1111
+wcr 8 1110
+wcr 3 1001
+ra
+wcr 4 0001
+ra
+wcr 0 0000
+sh a 011001110
+wcr 0 0111
+wcr 1 1111
+wcr 7 1000
+wcr 0 0000
+sh a 000101100
+wcr 2 0100
+wcr 5 0001
+ra
+wcr 1 1000
+sh a 001100010
+wcr 0 1011
+wcr 2 1011
+sh a 101101101
+wcr 4 1000
+ra
+wcr 2 1100
+sh a 101000000
+wcr 4 0000
+sh a 110100011
+wcr 8 0011
+wcr 7 1101
+wcr 3 0110
+sh a 010011101
+wcr 2 1110
+sh a 001001110
+wcr 5 0001
+wcr 3 0111
+wcr 1 1110
+ra
+wcr 3 1101
+wcr 5 0101
+wcr 2 1110
+wcr 8 0011
+wcr 6 0111
+wcr 3 0111
+wcr 2 1001
+ra
+wcr 2 1001
+wcr 4 0110
+wcr 2 1111
+wcr 4 0001
+sh a 100100111
+wcr 2 1100
+sh a 111110101
+wcr 6 1010
+wcr 2 1100
+wcr 2 0110
+sh a 010100100
+wcr 5 0010
+wcr 7 1111
+wcr 6 0001
+wcr 3 1001
+wcr 1 0101
+sh a 110000001
+wcr 0 0101
+wcr 1 0100
+wcr 6 0010
+wcr 8 1111
+sh a 110011100
+wcr 8 0010
+ra
+wcr 8 0000
+ra
+wcr 0 0010
+wcr 3 0000
+wcr 5 0000
+wcr 8 1100
+sh a 010010011
+wcr 7 1111
+sh a 111111000
+wcr 3 1101
+wcr 4 0100
+wcr 2 1000
+wcr 3 0000
+wcr 7 0010
+wcr 1 0111
+wcr 6 1110
+wcr 4 0100
+wcr 7 1111
+ra
+wcr 1 1101
+wcr 4 1111
+wcr 5 0111
+wcr 3 1111
+wcr 1 1010
+wcr 6 0001
+wcr 8 0101
+wcr 3 1000
+sh a 000100010
+wcr 0 1111
+wcr 0 1110
+ra
+wcr 7 1110
+sh a 001111101
+wcr 4 1110
+ra
+wcr 0 0100
+wcr 8 1111
+sh a 111010011
+wcr 1 1000
+wcr 0 1000
+wcr 6 0111
+wcr 0 0100
+wcr 0 0111
+wcr 3 1011
+ra
+wcr 6 0000
+ra
+wcr 4 0111
+wcr 3 1101
+sh a 111101101
+wcr 6 1000
+ra
+wcr 8 1100
+wcr 0 0011
+sh a 111101010
+wcr 6 0101
+sh a 000010001
+wcr 0 1101
+sh a 100010110
+wcr 3 0010
+ra
+wcr 5 1000
+ra
+wcr 7 0000
+ra
+wcr 1 1001
+ra
+wcr 4 1010
+sh a 011100011
+wcr 7 1110
+wcr 8 1101
+wcr 5 0001
+wcr 8 0011
+ra
+wcr 0 0010
+wcr 8 1111
+wcr 7 0000
+wcr 2 0011
+wcr 6 0100
+sh a 101101000
+wcr 1 1011
+sh a 011000110
+wcr 2 1101
+wcr 8 1100
+wcr 1 1111
+sh a 011111001
+wcr 5 1100
+wcr 8 0110
+wcr 8 0110
+ra
+wcr 6 0000
+wcr 1 0111
+wcr 1 0111
+wcr 7 0111
+wcr 7 1000
+ra
+wcr 0 1101
+wcr 2 0011
+sh a 110101001
+wcr 2 1000
+wcr 2 1000
+ra
+wcr 8 0111
+sh a 100100010
+wcr 2 1101
+ra
+wcr 6 1100
+wcr 2 0010
+wcr 1 0100
+ra
+wcr 4 0011
+wcr 7 0110
+wcr 1 1101
+wcr 0 1001
+wcr 2 0110
+sh a 010010100
+wcr 1 1100
+wcr 5 1110
+wcr 4 1011
+sh a 001110110
+wcr 5 0111
+sh a 010001110
+wcr 8 0101
+wcr 1 0001
+wcr 6 1000
+sh a 110111110
+wcr 4 0100
+wcr 7 0011
+sh a 001010001
+wcr 8 0010
+sh a 110000100
+wcr 1 1011
+wcr 2 1101
+wcr 0 1111
+wcr 4 1010
+sh a 100100101
+wcr 3 1101
+wcr 6 0110
+sh a 111110010
+wcr 1 0111
+wcr 0 0100
+wcr 5 0101
+wcr 6 1111
+wcr 0 1100
+ra
+wcr 1 0001
+wcr 5 1110
+ra
+wcr 1 1110
+ra
+wcr 3 1000
+wcr 2 0001
+wcr 3 0101
+wcr 4 0111
+wcr 1 1001
+wcr 0 1001
+ra
+wcr 8 0110
+ra
+wcr 6 0101
+wcr 6 0101
+sh a 110011001
+wcr 5 1010
+wcr 2 0100
+wcr 7 1101
+ra
+wcr 7 0001
+wcr 4 0111
+wcr 7 0110
+wcr 6 0110
+wcr 5 1000
+ra
+wcr 3 0001
+wcr 1 1001
+wcr 7 0100
+wcr 5 0010
+wcr 8 1010
+wcr 5 0100
+ra
+wcr 4 1000
+wcr 6 1111
+sh a 111100101

@@ -11,6 +11,8 @@ TOTAL_KERNEL_ROWS = 384
 ARRAY_ROWS = 18  # real rows
 ARRAY_COLS = 3
 
+PART_COUNT = 280
+PART_INDEX = 1  # 1-based
 
 OUT_FILE = "out.txt"
 
@@ -34,6 +36,7 @@ def prepare_search_string(in_weights_file):
             i = 0
 
             # write reference column
+            # out_string += "nop\n"  # for simulation stability
             out_string += "wcc " + str(ARRAY_COLS) + " "
             for col in range(COLS_PER_KERNEL):
                 for row_i, row in enumerate(kernel):
@@ -42,6 +45,7 @@ def prepare_search_string(in_weights_file):
                     else:
                         out_string += str(1-int(row[col]))
             out_string += "\n"
+            out_string += "nop\n"  # for simulation stability
 
             # search
             out_string += "sh  a "
@@ -95,7 +99,7 @@ def main():
     search_string = prepare_search_string(in_weights_file)
 
     image_arr = prepare_image_arr(in_image_file)
-    for i in range(0, (len(image_arr)-2)//2, 3):
+    for i in range((PART_INDEX-1)*(len(image_arr)-2)//PART_COUNT, PART_INDEX*(len(image_arr)-2)//PART_COUNT, 3):
         # fill in the image
         out_file.write(image_arr[i] + "\n")
         out_file.write(image_arr[i+1] + "\n")
@@ -104,21 +108,21 @@ def main():
         # do the search
         out_file.write(search_string)
 
-        # switch 1
-        out_file.write("sw 0\n")
+        # # switch 1
+        # out_file.write("sw 0\n")
 
-        # do the search
-        out_file.write(search_string)
+        # # do the search
+        # out_file.write(search_string)
 
-        # switch 2
-        out_file.write("sw 0\n")
-        out_file.write("sw 1\n")
+        # # switch 2
+        # out_file.write("sw 0\n")
+        # out_file.write("sw 1\n")
 
-        # do the search
-        out_file.write(search_string)
+        # # do the search
+        # out_file.write(search_string)
 
-        # switch back to normal
-        out_file.write("sw 1\n")
+        # # switch back to normal
+        # out_file.write("sw 1\n")
 
     in_weights_file.close()
     in_image_file.close()
