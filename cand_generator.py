@@ -2,14 +2,16 @@ import os
 import math
 import logging
 
-HOLD_TIME = 10
-SWITCH_TIME = HOLD_TIME/100
+HOLD_TIME = 100
+SWITCH_TIME = HOLD_TIME/10
+SWITCH_VOLTAGE = 1
 DECIMAL_COUNT = max(0, math.ceil(-math.log(min(HOLD_TIME, SWITCH_TIME), 10)))
 FORMAT_STR = "{:."+str(DECIMAL_COUNT)+"f}"
 OUT_DIR = "out"
-# INPUT_FILE = "out.txt"
+INPUT_FILE = "out.txt"
+# INPUT_FILE = "input18_32_3.txt"
 # INPUT_FILE = "input18_4_3.txt"
-INPUT_FILE = "out_random.txt"
+# INPUT_FILE = "out_random.txt"
 # ======================
 
 
@@ -58,9 +60,9 @@ def append_ml_sw(flip=False):
     for ml_sw in ML_SW:
         if(len(ml_sw) == 0):
             if flip:
-                ml_sw.append(-1)
+                ml_sw.append(-SWITCH_VOLTAGE)
             else:
-                ml_sw.append(1)
+                ml_sw.append(SWITCH_VOLTAGE)
         else:
             if flip:
                 ml_sw.append(-ml_sw[-1])
@@ -85,14 +87,14 @@ def perform_read(rows, cols=[]):
 
     for i, bl_sw in enumerate(BL_SW):
         if i in cols or len(cols) == 0:
-            bl_sw.append(1)
+            bl_sw.append(SWITCH_VOLTAGE)
         else:
-            bl_sw.append(-1)
+            bl_sw.append(-SWITCH_VOLTAGE)
     for i, sl_sw in enumerate(SL_SW):
         if i in rows:
-            sl_sw.append(1)
+            sl_sw.append(SWITCH_VOLTAGE)
         else:
-            sl_sw.append(-1)
+            sl_sw.append(-SWITCH_VOLTAGE)
 
     for i, wl in enumerate(WL):
         if i in rows:  # selected row
@@ -131,9 +133,9 @@ def perform_row_write(row0, bits):
 
         # setup switches
         for sl_sw in SL_SW:
-            sl_sw.append(1)
+            sl_sw.append(SWITCH_VOLTAGE)
         for bl_sw in BL_SW:
-            bl_sw.append(1)
+            bl_sw.append(SWITCH_VOLTAGE)
 
         append_ml_sw()
 
@@ -188,12 +190,12 @@ def perform_col_write(col0, bits):
 
         # setup switches
         for sl_sw in SL_SW:
-            sl_sw.append(1)
+            sl_sw.append(SWITCH_VOLTAGE)
         for i, bl_sw in enumerate(BL_SW):
             if (i == col0):
-                bl_sw.append(1)
+                bl_sw.append(SWITCH_VOLTAGE)
             else:
-                bl_sw.append(-1)  # close unneeded columns
+                bl_sw.append(-SWITCH_VOLTAGE)  # close unneeded columns
 
         append_ml_sw()
 
@@ -273,7 +275,7 @@ for line in in_file:
         rows = [int(row) for row in rows]
         perform_read(rows)
 
-    # READ
+    # READ ALL
     elif command == "ra":
         if(len(args) < 1 or len(args) > 1):
             print("Error: Wrong amount of arguments.")

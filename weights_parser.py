@@ -1,5 +1,4 @@
 # weights csv to cand converter
-import os
 import copy
 
 WEIGHTS_FILE = "weights_layer0.csv"
@@ -9,9 +8,9 @@ COLS_PER_KERNEL = 3
 TOTAL_KERNEL_ROWS = 384
 
 ARRAY_ROWS = 18  # real rows
-ARRAY_COLS = 3
+ARRAY_COLS = 3  # without reference
 
-PART_COUNT = 280
+PART_COUNT = 70
 PART_INDEX = 1  # 1-based
 
 OUT_FILE = "out.txt"
@@ -45,7 +44,20 @@ def prepare_search_string(in_weights_file):
                     else:
                         out_string += str(1-int(row[col]))
             out_string += "\n"
-            out_string += "nop\n"  # for simulation stability
+            # out_string += "nop\n"  # for simulation stability
+
+            # write junk column
+            out_string += "wcc " + str(ARRAY_COLS-1) + " "
+            for _ in range(COLS_PER_KERNEL*ROWS_PER_KERNEL):
+                # out_string += str(random.randint(0, 1))
+                out_string += "0"
+            out_string += "\n"
+            out_string += "wcc " + str(ARRAY_COLS-1) + " "
+            for _ in range(COLS_PER_KERNEL*ROWS_PER_KERNEL):
+                # out_string += str(random.randint(0, 1))
+
+                out_string += "1"
+            out_string += "\n"
 
             # search
             out_string += "sh  a "
@@ -70,6 +82,7 @@ def prepare_image_arr(in_image_file):
         image_arr[i] = "0" + line + "0"
     image_string = "".join(image_arr)
     # print(image_string)
+
     # splits to pieces
     n = 3
     image_arr = [image_string[i:i+n]
@@ -77,10 +90,10 @@ def prepare_image_arr(in_image_file):
     # print(image_arr)
     # print(len(image_arr))
     for i in range(0, len(image_arr)-20, 1):
-        out_arr.append("wcc " + str(i % 3) + " " +
+        out_arr.append("wcc " + str(i % 2) + " " +
                        image_arr[i] + image_arr[i+10] + image_arr[i+20])
-    out_arr.append("wcc 1 000000000")
-    out_arr.append("wcc 2 000000000")
+    # out_arr.append("wcc 0 000000000")
+    # out_arr.append("wcc 1 000000000")
 
     # print(out_arr)
     # print(len(out_arr))
@@ -99,11 +112,16 @@ def main():
     search_string = prepare_search_string(in_weights_file)
 
     image_arr = prepare_image_arr(in_image_file)
-    for i in range((PART_INDEX-1)*(len(image_arr)-2)//PART_COUNT, PART_INDEX*(len(image_arr)-2)//PART_COUNT, 3):
+
+    # for i in range(10):
+    #     print((i*len(image_arr)//2)//PART_COUNT)
+
+    # for i in range((PART_INDEX-1)*(len(image_arr)-1)//PART_COUNT//2, PART_INDEX*(len(image_arr)-1)//PART_COUNT//2, 1):
+    for i in range(((PART_INDEX-1)*len(image_arr)//2)//PART_COUNT, (PART_INDEX*len(image_arr)//2)//PART_COUNT, 1):
         # fill in the image
-        out_file.write(image_arr[i] + "\n")
-        out_file.write(image_arr[i+1] + "\n")
-        out_file.write(image_arr[i+2] + "\n")
+        out_file.write(image_arr[2*i] + "\n")
+        out_file.write(image_arr[2*i+1] + "\n")
+        # out_file.write(image_arr[i+2] + "\n")
 
         # do the search
         out_file.write(search_string)
