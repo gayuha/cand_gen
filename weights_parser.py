@@ -11,7 +11,8 @@ ARRAY_ROWS = 18  # real rows
 ARRAY_COLS = 3  # without reference
 
 PART_COUNT = 70
-PART_INDEX = 1  # 1-based
+# 1-based
+PART_INDEX = 50
 
 OUT_FILE = "out.txt"
 
@@ -101,7 +102,7 @@ def prepare_image_arr(in_image_file):
     return out_arr
 
 
-def main():
+def weights_parser():
     print("Weights parser started!\n")
 
     in_weights_file = open(WEIGHTS_FILE, "r")
@@ -116,31 +117,18 @@ def main():
     # for i in range(10):
     #     print((i*len(image_arr)//2)//PART_COUNT)
 
+    print("Part " + str(PART_INDEX) + " of " + str(PART_COUNT))
     # for i in range((PART_INDEX-1)*(len(image_arr)-1)//PART_COUNT//2, PART_INDEX*(len(image_arr)-1)//PART_COUNT//2, 1):
     for i in range(((PART_INDEX-1)*len(image_arr)//2)//PART_COUNT, (PART_INDEX*len(image_arr)//2)//PART_COUNT, 1):
         # fill in the image
         out_file.write(image_arr[2*i] + "\n")
         out_file.write(image_arr[2*i+1] + "\n")
         # out_file.write(image_arr[i+2] + "\n")
+        print(image_arr[2*i])
+        print(image_arr[2*i+1])
 
         # do the search
         out_file.write(search_string)
-
-        # # switch 1
-        # out_file.write("sw 0\n")
-
-        # # do the search
-        # out_file.write(search_string)
-
-        # # switch 2
-        # out_file.write("sw 0\n")
-        # out_file.write("sw 1\n")
-
-        # # do the search
-        # out_file.write(search_string)
-
-        # # switch back to normal
-        # out_file.write("sw 1\n")
 
     in_weights_file.close()
     in_image_file.close()
@@ -150,4 +138,4 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    weights_parser()
