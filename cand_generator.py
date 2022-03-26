@@ -3,15 +3,25 @@ import math
 import logging
 
 HOLD_TIME = 100
-SWITCH_TIME = HOLD_TIME/10
+SWITCH_TIME = HOLD_TIME/3
 SWITCH_VOLTAGE = 1
-DECIMAL_COUNT = max(0, math.ceil(-math.log(min(HOLD_TIME, SWITCH_TIME), 10)))
-FORMAT_STR = "{:."+str(DECIMAL_COUNT)+"f}"
+# DECIMAL_COUNT = max(0, math.ceil(-math.log(min(HOLD_TIME, SWITCH_TIME), 10)))
+DECIMAL_COUNT = 3
+# FORMAT_STR = "{:."+str(DECIMAL_COUNT)+"f}"
 OUT_DIR = "out"
 INPUT_FILE = "out.txt"
 # INPUT_FILE = "input18_32_3.txt"
 # INPUT_FILE = "input18_4_3.txt"
 # INPUT_FILE = "out_random.txt"
+
+VW0 = -0.7
+VW1 = 2
+VWL = 1.5
+VSL = 1.5
+
+
+VOLTAGE_PRECISION = 3  # number of digits after decimal point for voltages
+INTERPOLATION_POINTS = 2
 # ======================
 
 
@@ -98,15 +108,15 @@ def perform_read(rows, cols=[]):
 
     for i, wl in enumerate(WL):
         if i in rows:  # selected row
-            wl.append("VWL")
+            wl.append(VWL)
         else:  # unselected row
-            wl.append("0")
+            wl.append(0)
 
     for i, sl in enumerate(SL):
         if i in rows:  # selected row
-            sl.append("VSL")
+            sl.append(VSL)
         else:  # unselected row
-            sl.append("0")
+            sl.append(0)
 
 
 def perform_row_write(row0, bits):
@@ -144,24 +154,24 @@ def perform_row_write(row0, bits):
         if bit == "0":
             BuL[i].append(0)
         else:
-            BuL[i].append("2*VW0/3")
+            BuL[i].append(2*VW0/3)
 
     for i, wl in enumerate(WL):
         if i == row0:  # selected row
-            wl.append("VW0")
+            wl.append(VW0)
         else:  # unselected row
-            wl.append("VW0/3")
+            wl.append(VW0/3)
 
     # write ones
     for i, bit in enumerate(bits):
         if bit == "1":
-            BuL[i].append("-VW1/2")
+            BuL[i].append(-VW1/2)
         else:
             BuL[i].append(0)
 
     for i, wl in enumerate(WL):
         if i == row0:  # selected row
-            wl.append("VW1/2")
+            wl.append(VW1/2)
         else:  # unselected row
             wl.append(0)
 
@@ -204,29 +214,86 @@ def perform_col_write(col0, bits):
         if i == col0:
             BuL[i].append(0)
         else:
-            BuL[i].append("2*VW0/3")
+            BuL[i].append(2*VW0/3)
 
     for i, bit in enumerate(bits):
         if bit == "0":
-            WL[i].append("VW0")
+            WL[i].append(VW0)
         else:
-            WL[i].append("VW0/3")
+            WL[i].append(VW0/3)
 
     # write ones
     for i, bul in enumerate(BuL):
         if i == col0:
-            BuL[i].append("-VW1/2")
+            BuL[i].append(-VW1/2)
         else:
             BuL[i].append(0)
 
     for i, bit in enumerate(bits):
         if bit == "1":
-            WL[i].append("VW1/2")
+            WL[i].append(VW1/2)
         else:
             WL[i].append(0)
 
 
+def interpolate(t0, t1, v0, v1, point_count):
+    result = []
+    if v0 == v1:
+        return [(t0, v0), (t1, v1)]
+
+    # if (v0 <= 0 or v1 <= 0 or v0 >= 1 or v1 >= 1):
+    #     return [(t0, v0), (t1, v1)]
+
+    # print("\n")
+    # print("(t0,v0) = ", end="")
+    # print((str(t0), str(v0)))
+    # print("(t1,v1) = ", end="")
+    # print((str(t1), str(v1)))
+    # exit()
+    # return [(t0, v0), (t1, v1)]
+
+    c = min(v0, v1) - 0.01
+    v0 -= c
+    v1 -= c
+
+    a = abs(v1-v0)+0.1
+    v0 /= a
+    v1 /= a
+
+    # print("c = ", str(c))
+    # print("a = ", str(a))
+
+    # print(v0)
+    # print(math.log(v0/(1-v0)))
+    # print(v1)
+    # print(math.log(v1/(1-v1)))
+
+    A = math.log(v0/(1-v0))/math.log(v1/(1-v1))
+    m = (t0-A*t1)/(1-A)
+    k = math.log(v0/(1-v0))/(t0-m)
+
+    for i in range(point_count):
+        t = t0+i*(t1-t0)/(point_count-1)
+        v = 1/(1+math.exp(-k*(t-m)))
+        # print((t, v))
+        v *= a
+        v += c
+        result.append((t, v))
+
+    # midpoint = ((t0+t1)/2, (v0+v1)/2)
+    # return [(t0, v0), midpoint, (t1, v1)]
+    # print(result)
+    return result
+    # return [(t0, v0), (t1, v1)]
+
+
 # ======================
+
+# inputs = [BL, BuL, WL, SL, BL_SW, SL_SW, ML_SW]
+for input in inputs:
+    for i in input:
+        i.append(0)
+
 for line in in_file:
     # print(f"parsing: {line}", end="")
     args = line.split()
@@ -414,12 +481,27 @@ print("Writing output files... ", end="", flush=True)
 for input_id, input in enumerate(inputs):
     for i, arr in enumerate(input):
         out_file = open(f"{OUT_DIR}/{input_names[input_id]}_{i}.txt", "w")
-        out_file.write("0u 0\n")
-        for i, v in enumerate(arr):
-            time_1 = FORMAT_STR.format(i*HOLD_TIME+SWITCH_TIME)
-            time_2 = FORMAT_STR.format((i+1)*HOLD_TIME)
-            out_file.write(f"{time_1}u {v}\n")
-            out_file.write(f"{time_2}u {v}\n")
+        # out_file.write("0u 0\n")
+        # if(f"{input_names[input_id]}_{i}.txt" == "bul_0.txt"):
+        #     print(arr)
+        for j, v in enumerate(arr[1:]):
+            time_0 = j*HOLD_TIME
+            time_1 = j*HOLD_TIME+SWITCH_TIME
+
+            points = interpolate(
+                time_0, time_1, arr[j], arr[j+1], INTERPOLATION_POINTS)
+
+            for point in points:
+                # time_str = FORMAT_STR.format(point[0])
+                time_str = round(point[0], DECIMAL_COUNT)
+                v_str = str(round(point[1], VOLTAGE_PRECISION))
+                out_file.write(f"{time_str}u {v_str}\n")
+
+            # time_0_str = FORMAT_STR.format(time_0)
+            # time_1_str = FORMAT_STR.format(time_1)
+
+            # out_file.write(f"{time_0_str}u {arr[j-1]}\n")
+            # out_file.write(f"{time_1_str}u {arr[j]}\n")
         out_file.close()
 
 print(" Wrote files.")

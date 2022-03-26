@@ -1,18 +1,21 @@
 # weights csv to cand converter
 import copy
 
-WEIGHTS_FILE = "weights_layer0.csv"
+WEIGHTS_FILE = "weights_layer0_2.csv"
 IMAGE_FILE = "image.csv"
 ROWS_PER_KERNEL = 3
 COLS_PER_KERNEL = 3
 TOTAL_KERNEL_ROWS = 384
 
+STRIDE_HOR = 5
+STRIDE_VER = 5
+
 ARRAY_ROWS = 18  # real rows
 ARRAY_COLS = 3  # without reference
 
-PART_COUNT = 70
+PART_COUNT = 9
 # 1-based
-PART_INDEX = 50
+PART_INDEX = 6
 
 OUT_FILE = "out.txt"
 
@@ -85,14 +88,20 @@ def prepare_image_arr(in_image_file):
     # print(image_string)
 
     # splits to pieces
-    n = 3
+    n = 1
     image_arr = [image_string[i:i+n]
                  for i in range(0, len(image_string), n)]
     # print(image_arr)
     # print(len(image_arr))
-    for i in range(0, len(image_arr)-20, 1):
+    for i in range(0, len(image_arr)-62, STRIDE_HOR):
+        if (i % 30) > 27:
+            continue
+        if (i // 30) % STRIDE_VER != 0:
+            continue
         out_arr.append("wcc " + str(i % 2) + " " +
-                       image_arr[i] + image_arr[i+10] + image_arr[i+20])
+                       (image_arr[i]+image_arr[i+1]+image_arr[i+2]) +
+                       (image_arr[i+30]+image_arr[i+31]+image_arr[i+32]) +
+                       (image_arr[i+60]+image_arr[i+61]+image_arr[i+62]))
     # out_arr.append("wcc 0 000000000")
     # out_arr.append("wcc 1 000000000")
 
@@ -114,19 +123,28 @@ def weights_parser():
 
     image_arr = prepare_image_arr(in_image_file)
 
+    if (len(image_arr) % PART_COUNT != 0):
+        print(str(len(image_arr))+" is not divisable by " +
+              str(PART_COUNT)+". Will exit now.")
+        exit()
+
+    print(len(image_arr))
+
     # for i in range(10):
     #     print((i*len(image_arr)//2)//PART_COUNT)
 
+    wcc_count = 0
+
     print("Part " + str(PART_INDEX) + " of " + str(PART_COUNT))
     # for i in range((PART_INDEX-1)*(len(image_arr)-1)//PART_COUNT//2, PART_INDEX*(len(image_arr)-1)//PART_COUNT//2, 1):
-    for i in range(((PART_INDEX-1)*len(image_arr)//2)//PART_COUNT, (PART_INDEX*len(image_arr)//2)//PART_COUNT, 1):
+    for i in range(((PART_INDEX-1)*len(image_arr))//PART_COUNT, (PART_INDEX*len(image_arr))//PART_COUNT, 2):
         # fill in the image
-        out_file.write(image_arr[2*i] + "\n")
-        out_file.write(image_arr[2*i+1] + "\n")
+        out_file.write(image_arr[i] + "\n")
+        out_file.write(image_arr[i+1] + "\n")
         # out_file.write(image_arr[i+2] + "\n")
-        print(image_arr[2*i])
-        print(image_arr[2*i+1])
-
+        print(image_arr[i])
+        print(image_arr[i+1])
+        wcc_count += 2
         # do the search
         out_file.write(search_string)
 
@@ -134,6 +152,7 @@ def weights_parser():
     in_image_file.close()
     out_file.close()
 
+    print("Doing " + str(wcc_count) + " writes.")
     print("Weights parser ended!")
 
 

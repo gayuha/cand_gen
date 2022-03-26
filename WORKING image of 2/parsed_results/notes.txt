@@ -1,0 +1,10 @@
+9 parts
+
+zeros:
+1
+2
+8
+9
+
+problematic:
+6

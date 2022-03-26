@@ -14,12 +14,13 @@ REF_COL_CSV = 2 * ARRAY_COLS - 1
 JUNK_COL_CSV = 2 * ARRAY_COLS - 3
 
 PICTURE_NUMBER = 1
-PART_NUMBER = 50
+PART_COUNT = 3
 
 
-def parse_results():
+def parse_results(part_number):
     print("Started parsing results!")
-    print("Parsing picture "+str(PICTURE_NUMBER)+" part "+str(PART_NUMBER))
+    print("Parsing picture "+str(PICTURE_NUMBER) +
+          " part "+str(part_number)+"/"+str(PART_COUNT))
 
     search_times = []
 
@@ -53,8 +54,8 @@ def parse_results():
     for i in range(KERNEL_COUNT):
         rows += [[i]]
 
-    with open(RESULTS_FOLDER+"/pic"+str(PICTURE_NUMBER)+"_part"+str(PART_NUMBER)+".csv", "r") as csv_infile:
-        with open(PARSED_RESULTS_FOLDER+"/pic"+str(PICTURE_NUMBER)+"_part"+str(PART_NUMBER)+"_parsed.csv", "w") as csv_outfile:
+    with open(RESULTS_FOLDER+"/pic"+str(PICTURE_NUMBER)+"_part"+str(part_number)+".csv", "r") as csv_infile:
+        with open(PARSED_RESULTS_FOLDER+"/pic"+str(PICTURE_NUMBER)+"_part"+str(part_number)+"_parsed.csv", "w", newline='') as csv_outfile:
             reader = csv.reader(csv_infile, delimiter=',')
             writer = csv.writer(csv_outfile, delimiter=",")
             kernel_index = 0
@@ -70,12 +71,17 @@ def parse_results():
                 # print(type(float(row[0])))
 
                 if float(row[0]) >= search_times[search_times_index]:
-                    # print("performing search at time: " + row[0])
+                    # print("performing search at time: " + row[0], end=", ")
                     output_row = []
                     # output_row = [kernel_index]
-                    ref = row[REF_COL_CSV]
+                    ref = float(row[REF_COL_CSV])
+                    # print("ref is ", ref, end=", ")
                     for col in range(1, JUNK_COL_CSV, 2):
-                        output_row.append(int(row[col] > ref))
+                        curr = float(row[col])
+                        # print("row[", col, "] is ", row[col], end=", ")
+                        # print("bigger? ", curr > ref, end=", ")
+                        output_row.append(int(curr > ref))
+                    # print("")
                     # writer.writerow(output_row)
                     rows[kernel_index] += (output_row)
                     counter += 1
@@ -101,4 +107,5 @@ def parse_results():
 
 
 if __name__ == "__main__":
-    parse_results()
+    for part_number in range(1, PART_COUNT+1, 1):
+        parse_results(part_number)
